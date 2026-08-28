@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  business-case:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: projet-16
+
+      # Ce business case part de la base du Projet 07 (même compte, port 5433) — voir README.
+      - name: Récupérer la base du Projet 07
+        uses: actions/checkout@v4
+        with:
+          repository: valentinratigniet-byte/projet-07-base-ecommerce
+          path: projet-07
+
+      - name: Démarrer PostgreSQL (Projet 07)
+        working-directory: projet-07
+        run: docker compose up -d
+
+      - name: Attendre que la base soit prête
+        run: |
+          for i in $(seq 1 20); do
+            docker exec p07_ecommerce_db pg_isready -U portfolio -d ecommerce && exit 0
+            sleep 2
+          done
+          echo "Postgres jamais devenu ready" >&2
+          exit 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Peupler la base source (Faker)
+        working-directory: projet-07
+        run: |
+          pip install -r seed/requirements.txt
+          python seed/seed.py
+
+      - name: Installer les dépendances du business case
+        working-directory: projet-16
+        run: pip install -r requirements.txt
+
+      - name: Générer le rapport (self-check NPV/IRR/payback inclus)
+        working-directory: projet-16/src
+        run: python report.py
