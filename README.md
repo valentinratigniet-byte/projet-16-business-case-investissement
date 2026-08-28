@@ -9,8 +9,8 @@
 > [Projet 07](https://github.com/valentinratigniet-byte/projet-07-base-ecommerce)
 > sont annulées, mesuré sur 24 mois réels.
 
-**Démo live** : *à venir — déploiement Streamlit Community Cloud, voir
-[§ Déployer une démo publique](#-déployer-une-démo-publique)*.
+**Démo live** : [projet-16-business-case-investissement-data.streamlit.app](https://projet-16-business-case-investissement-data.streamlit.app/)
+(Streamlit Community Cloud — voir [§ Déployer une démo publique](#-déployer-une-démo-publique)).
 
 ## 🎯 Problème métier
 
@@ -89,8 +89,13 @@ Déploiement sur [Streamlit Community Cloud](https://streamlit.io/cloud)
 2. "New app" → repo `projet-16-business-case-investissement`, branche `main`,
    fichier principal `src/app.py`. Rien d'autre à configurer :
    `requirements.txt` est déjà à la racine attendue.
-3. Coller l'URL obtenue ici et dans l'entrée du portfolio
-   (`portfolio-data/README.md` + `_github-profile/README.md`).
+3. **Vérifier que l'app est publique** : par défaut Streamlit Cloud peut la
+   laisser en accès restreint (redirection vers un écran de connexion pour
+   tout visiteur externe). Menu ⋮ → *Settings* → *Sharing* → cocher "This app
+   is public" — un reboot de l'app peut être nécessaire pour que ça
+   s'applique.
+
+**Démo déployée** : https://projet-16-business-case-investissement-data.streamlit.app/
 
 Comme le Projet 03 sur Render, le free tier peut se mettre en veille après
 une période d'inactivité — premier chargement un peu plus lent, pas un bug.
