@@ -11,7 +11,7 @@ Aucune dépendance externe pour le calcul financier (pas de numpy-financial) :
 NPV = somme actualisée, IRR = recherche de racine par bissection sur NPV(r).
 """
 import os
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 import psycopg2
 
@@ -25,10 +25,31 @@ class Baseline:
     annual_orders: float
     cancellation_rate: float
     avg_value_cancelled: float
+    is_live: bool = True       # False = instantané de repli (base non joignable)
+    snapshot_date: str = ""    # renseigné seulement quand is_live=False
+
+
+# Instantané figé des 3 chiffres mesurés le 2026-08-28 (voir README) — sert
+# de repli quand la base du Projet 07 n'est pas joignable (ex. démo publique
+# Streamlit Cloud : elle ne peut pas atteindre le Postgres local en Docker).
+# En local, avec la base lancée, fetch_baseline() interroge toujours le vrai
+# Postgres — ce repli n'est qu'un filet pour l'environnement de démo.
+SNAPSHOT = Baseline(
+    annual_orders=19_232.0,
+    cancellation_rate=0.0718,
+    avg_value_cancelled=1_787.57,
+    is_live=False,
+    snapshot_date="2026-08-28",
+)
 
 
 def fetch_baseline() -> Baseline:
-    conn = psycopg2.connect(DSN); cur = conn.cursor()
+    try:
+        conn = psycopg2.connect(DSN, connect_timeout=3)
+    except psycopg2.OperationalError:
+        return SNAPSHOT
+
+    cur = conn.cursor()
     cur.execute("""
         SELECT count(*), count(*) FILTER (WHERE status = 'cancelled'),
                count(DISTINCT date_trunc('month', order_date))
@@ -146,7 +167,8 @@ if __name__ == "__main__":
     b = fetch_baseline()
     self_check(b, Assumptions())
     r = evaluate(b, Assumptions())
-    print(f"Baseline : {b.annual_orders:,.0f} commandes/an, "
+    origin = "mesuré en direct" if b.is_live else f"instantané de repli du {b.snapshot_date} (base non joignable)"
+    print(f"Baseline ({origin}) : {b.annual_orders:,.0f} commandes/an, "
           f"{b.cancellation_rate:.2%} d'annulation, "
           f"valeur moy. commande annulée {b.avg_value_cancelled:,.0f} €")
     print(f"NPV {r.npv:,.0f} € · IRR {r.irr:.1%} · payback {r.payback_years:.1f} ans"

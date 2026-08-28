@@ -24,6 +24,11 @@ def load_baseline():
 
 base = load_baseline()
 
+if not base.is_live:
+    st.info(f"Base Postgres non joignable depuis cette démo publique — constat figé sur "
+            f"l'instantané mesuré le {base.snapshot_date} (voir README). En local, avec la base "
+            f"du Projet 07 lancée, ces chiffres sont recalculés en direct.", icon="📸")
+
 st.subheader("Constat mesuré (base réelle)")
 c1, c2, c3 = st.columns(3)
 c1.metric("Commandes / an", f"{base.annual_orders:,.0f}")

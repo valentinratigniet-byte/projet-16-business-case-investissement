@@ -9,6 +9,9 @@
 > [Projet 07](https://github.com/valentinratigniet-byte/projet-07-base-ecommerce)
 > sont annulées, mesuré sur 24 mois réels.
 
+**Démo live** : *à venir — déploiement Streamlit Community Cloud, voir
+[§ Déployer une démo publique](#-déployer-une-démo-publique)*.
+
 ## 🎯 Problème métier
 
 Un fournisseur propose un dispositif anti-annulation (retry de paiement,
@@ -69,6 +72,29 @@ streamlit run src/app.py  # explorateur interactif (ajuster les curseurs)
 Sortie : `output/business_case_<AAAA-MM-JJ>.xlsx`. Exemple versionné :
 `output/exemple_business_case.xlsx`.
 
+## 🌐 Déployer une démo publique
+
+`app.py` se connecte à la base Postgres du Projet 07 (`127.0.0.1:5433` en
+local, via Docker) — injoignable depuis un hébergeur cloud. `fetch_baseline()`
+gère ça proprement : si la connexion échoue, elle retombe automatiquement sur
+un **instantané figé** des 3 chiffres mesurés le 28/08/2026 (voir
+`src/model.py`, constante `SNAPSHOT`), affiché avec un bandeau explicite dans
+l'app plutôt que de faire croire à une connexion live. Aucune base cloud à
+héberger pour la démo.
+
+Déploiement sur [Streamlit Community Cloud](https://streamlit.io/cloud)
+(gratuit) :
+
+1. Se connecter avec le compte GitHub `valentinratigniet-byte`.
+2. "New app" → repo `projet-16-business-case-investissement`, branche `main`,
+   fichier principal `src/app.py`. Rien d'autre à configurer :
+   `requirements.txt` est déjà à la racine attendue.
+3. Coller l'URL obtenue ici et dans l'entrée du portfolio
+   (`portfolio-data/README.md` + `_github-profile/README.md`).
+
+Comme le Projet 03 sur Render, le free tier peut se mettre en veille après
+une période d'inactivité — premier chargement un peu plus lent, pas un bug.
+
 ## 🗃️ Structure du repo
 
 ```
@@ -100,6 +126,11 @@ projet-16-business-case-investissement/
 - **Recommandation conditionnelle, pas un chiffre qui dit "oui"** : la
   sensibilité montre une marge de sécurité étroite sur le cas de base — un
   vrai mémo business analyst dit "sous conditions", pas juste "rentable".
+- **Repli explicite plutôt que fausse connexion live** : la démo publique ne
+  peut pas atteindre le Postgres local — `fetch_baseline()` retombe sur un
+  instantané daté et l'affiche comme tel (bandeau dans l'app), au lieu de
+  masquer silencieusement l'absence de données réelles. Vérifié par un step
+  CI dédié qui force l'échec de connexion.
 
 ---
 
