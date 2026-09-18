@@ -4,3 +4,6 @@ output/business_case_*.xlsx
 # Python
 __pycache__/
 .venv/
+
+# Sortie locale de /graphify (exploration perso, pas versionnee)
+graphify-out/
