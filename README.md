@@ -44,6 +44,8 @@ d'où la recommandation conditionnelle plutôt qu'un go inconditionnel.
 
 ## 🗂️ Architecture
 
+🗺️ **[Schéma du dépôt (GitDiagram)](https://gitdiagram.com/valentinratigniet-byte/projet-16-business-case-investissement)** : vue d'ensemble générée automatiquement à partir du code.
+
 ```mermaid
 flowchart LR
     A["Projet 07 (PostgreSQL)\norders : taux/valeur d'annulation réels"] --> B["model.py\nNPV / IRR / payback / sensibilité"]
