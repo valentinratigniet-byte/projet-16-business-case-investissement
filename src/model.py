@@ -43,11 +43,18 @@ SNAPSHOT = Baseline(
 )
 
 
-def fetch_baseline() -> Baseline:
+def fetch_baseline(allow_snapshot: bool = False) -> Baseline:
+    """Mesure le constat en base. Le repli sur l'instantané figé n'est permis que si
+    l'appelant le demande (démo Streamlit publique) : le rapport et le calcul en ligne de
+    commande échouent plutôt que de chiffrer en silence une décision sur des données d'août."""
     try:
         conn = psycopg2.connect(DSN, connect_timeout=3)
     except psycopg2.OperationalError:
-        return SNAPSHOT
+        if allow_snapshot:
+            return SNAPSHOT
+        raise SystemExit(f"Base du Projet 07 injoignable ({DSN.rsplit('@', 1)[-1]}) : lancez-la, "
+                         "ou utilisez l'app Streamlit qui affiche l'instantané du "
+                         f"{SNAPSHOT.snapshot_date} en le signalant.")
 
     cur = conn.cursor()
     cur.execute("""

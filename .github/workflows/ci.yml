@@ -50,15 +50,21 @@ jobs:
         working-directory: projet-16/src
         run: python report.py
 
-      - name: Vérifier le repli sur l'instantané (base injoignable, cas de la démo Streamlit Cloud)
+      - name: Vérifier le repli sur l'instantané (démo Streamlit) et l'arrêt explicite sinon
         working-directory: projet-16/src
         env:
           DATABASE_URL: "postgresql://portfolio:portfolio@127.0.0.1:1/ecommerce"
         run: |
           python -c "
           from model import fetch_baseline, SNAPSHOT
-          b = fetch_baseline()
-          assert b.is_live is False, 'devrait retomber sur le repli quand la base est injoignable'
+          b = fetch_baseline(allow_snapshot=True)
+          assert b.is_live is False, 'la démo doit retomber sur le repli quand la base est injoignable'
           assert b == SNAPSHOT, 'le repli doit renvoyer exactement SNAPSHOT'
+          try:
+              fetch_baseline()
+          except SystemExit as e:
+              print('Sans repli demandé, arrêt explicite :', e)
+          else:
+              raise AssertionError('sans allow_snapshot, une base injoignable doit arrêter le calcul')
           print('Repli OK :', b)
           "
