@@ -19,7 +19,7 @@ st.caption("Investir pour réduire le taux d'annulation mesuré sur la base du P
 
 @st.cache_data
 def load_baseline():
-    return fetch_baseline()
+    return fetch_baseline(allow_snapshot=True)  # démo publique : instantané signalé à l'écran
 
 
 base = load_baseline()
